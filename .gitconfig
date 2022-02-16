@@ -1,0 +1,15 @@
+[push]
+    default = current
+[pager]
+    branch = false
+[pull]
+    ff = only
+[alias]
+    unadd = reset
+    amend = commit --amend --no-edit
+    s = status
+    b = branch
+    co = checkout
+    lazy = ! git commit -a -m "test" && git push
+[diff]
+    noprefix = true
