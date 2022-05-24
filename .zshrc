@@ -2,7 +2,7 @@ export ZSH="$HOME/.oh-my-zsh"
 
 ZSH_THEME="common"
 ZSH_DISABLE_COMPFIX=true
-export HIGHLIGHT_STYLE=github
+
 export NVM_LAZY_LOAD=true
 export NVM_COMPLETION=true
 plugins=(
@@ -14,3 +14,7 @@ plugins=(
 source $ZSH/oh-my-zsh.sh
 DISABLE_AUTO_TITLE=true
 precmd() { echo -en "\033]0;$(basename `pwd`)\a" } # title bar prompt
+
+# Aliases
+alias vi="nvim"
+alias vim="nvim"
