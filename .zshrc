@@ -11,6 +11,9 @@ plugins=(
     Zsh-syntax-highlighting
 )
 
+export EDITOR="nvim"
+export VISUAL="nvim"
+
 source $ZSH/oh-my-zsh.sh
 DISABLE_AUTO_TITLE=true
 precmd() { echo -en "\033]0;$(basename `pwd`)\a" } # title bar prompt
