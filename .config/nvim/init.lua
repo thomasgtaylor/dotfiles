@@ -1,9 +1,8 @@
 require('packer').startup(function()
   use 'wbthomason/packer.nvim' -- Package manager
   use 'ellisonleao/gruvbox.nvim' -- Theme
-  use 'mhinz/vim-signify' -- VCS gutter
+  use 'lewis6991/gitsigns.nvim' -- VCS gutter
   use 'numtostr/BufOnly.nvim' -- Close all buffers except current
-  use 'tpope/vim-fugitive' -- Git in nvim
   use {
     'nvim-lualine/lualine.nvim', -- Status line
     requires = { 'kyazdani42/nvim-web-devicons' }
@@ -26,6 +25,7 @@ require('packer').startup(function()
   use 'hrsh7th/cmp-nvim-lsp' -- Completion engine integration
   use 'L3MON4D3/LuaSnip' -- Snipping
   use 'saadparwaiz1/cmp_luasnip' -- Nvim-cmp snipping integration
+  use 'jose-elias-alvarez/null-ls.nvim' -- Linting LSP integration
   use 'ejholmes/vim-forcedotcom' -- Apex Language Highlighting
 end)
 
@@ -67,6 +67,7 @@ nmap('<C-j>', ':wincmd j<CR>')
 nmap('<C-h>', ':wincmd h<CR>')
 nmap('<C-l>', ':wincmd l<CR>')
 
+require('gitsigns').setup()
 require('bufferline').setup()
 require('lualine').setup {
     options = { theme = 'gruvbox' }
@@ -103,6 +104,13 @@ cmp.setup({
     sources = cmp.config.sources({
         { name = 'nvim_lsp' },
     })
+})
+
+require("null-ls").setup({
+    sources = {
+        require("null-ls").builtins.diagnostics.eslint,
+        require("null-ls").builtins.completion.spell,
+    },
 })
 
 local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
