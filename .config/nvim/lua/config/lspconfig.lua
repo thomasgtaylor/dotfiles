@@ -5,6 +5,8 @@ lspconfig.tsserver.setup{
     capabilities = capabilities
 }
 lspconfig.yamlls.setup {
+  on_attach = on_attach,
+  capabilities = capabilities,
   settings = {
     yaml = {
       schemas = {
@@ -12,6 +14,10 @@ lspconfig.yamlls.setup {
       },
     },
   }
+}
+lspconfig.ltex.setup {
+  on_attach = on_attach,
+  capabilities = capabilities
 }
 
 local on_attach = function(client, bufnr)
