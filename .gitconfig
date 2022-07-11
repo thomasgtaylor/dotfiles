@@ -1,5 +1,6 @@
 [alias]
     unadd = reset
+    uncommit = reset HEAD^
     amend = commit --amend --no-edit
     s = status
 [diff]
