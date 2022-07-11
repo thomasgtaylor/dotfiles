@@ -47,11 +47,11 @@ packer.startup(function(use)
         'kyazdani42/nvim-tree.lua', -- File tree
         requires = { 'kyazdani42/nvim-web-devicons' },
         config = get_config('nvim-tree'),
+        after = 'gruvbox.nvim',
     })
     use({
         'neovim/nvim-lspconfig', -- Language Server Protocol
         config = get_config('lspconfig'),
-        after = 'gruvbox.nvim',
     })
     use({
         'hrsh7th/nvim-cmp', -- Completion engine
