@@ -36,6 +36,7 @@ packer.startup(function(use)
         tag = 'v2.*',
         requires = { 'kyazdani42/nvim-web-devicons' },
         config = get_config('bufferline'),
+        after = 'gruvbox.nvim',
     })
     use({
         'nvim-telescope/telescope.nvim', -- File search
@@ -50,6 +51,7 @@ packer.startup(function(use)
     use({
         'neovim/nvim-lspconfig', -- Language Server Protocol
         config = get_config('lspconfig'),
+        after = 'gruvbox.nvim',
     })
     use({
         'hrsh7th/nvim-cmp', -- Completion engine
