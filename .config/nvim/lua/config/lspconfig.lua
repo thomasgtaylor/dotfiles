@@ -1,20 +1,5 @@
 local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
 local lspconfig = require('lspconfig')
-lspconfig.tsserver.setup{
-    on_attach = on_attach,
-    capabilities = capabilities
-}
-lspconfig.yamlls.setup {
-  on_attach = on_attach,
-  capabilities = capabilities,
-  settings = {
-    yaml = {
-      schemas = {
-        ["https://json.schemastore.org/github-workflow.json"] = "/.github/workflows/*"
-      },
-    },
-  }
-}
 
 local on_attach = function(client, bufnr)
   vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
@@ -35,3 +20,25 @@ local on_attach = function(client, bufnr)
   vim.keymap.set('n', 'gr', vim.lsp.buf.references, bufopts)
   vim.keymap.set('n', '<space>f', vim.lsp.buf.formatting, bufopts)
 end
+
+local lsp_defaults = {
+    capabilities = capabilities,
+    on_attach = on_attach
+}
+
+lspconfig.util.default_config = vim.tbl_deep_extend(
+    'force',
+    lspconfig.util.default_config,
+    lsp_defaults
+)
+
+lspconfig.tsserver.setup({})
+lspconfig.yamlls.setup({
+  settings = {
+    yaml = {
+      schemas = {
+        ["https://json.schemastore.org/github-workflow.json"] = "/.github/workflows/*"
+      },
+    },
+  }
+})
