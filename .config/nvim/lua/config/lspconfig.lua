@@ -23,7 +23,7 @@ end
 
 local lsp_defaults = {
     capabilities = capabilities,
-    on_attach = on_attach
+    on_attach = on_attach,
 }
 
 lspconfig.util.default_config = vim.tbl_deep_extend(
@@ -42,3 +42,4 @@ lspconfig.yamlls.setup({
     },
   }
 })
+
