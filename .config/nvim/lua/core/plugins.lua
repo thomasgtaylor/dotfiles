@@ -44,10 +44,8 @@ packer.startup(function(use)
         config = get_config('telescope'),
     })
     use({
-        'kyazdani42/nvim-tree.lua', -- File tree
-        requires = { 'kyazdani42/nvim-web-devicons' },
-        config = get_config('nvim-tree'),
-        after = 'gruvbox.nvim',
+        'kevinhwang91/rnvimr', -- File search
+        config = get_config('ranger'),
     })
     use({
         'neovim/nvim-lspconfig', -- Language Server Protocol
@@ -71,3 +69,4 @@ packer.startup(function(use)
         config = get_config('null-ls'), 
     })
 end)
+
