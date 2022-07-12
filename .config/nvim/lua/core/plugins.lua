@@ -44,7 +44,7 @@ packer.startup(function(use)
         config = get_config('telescope'),
     })
     use({
-        'kevinhwang91/rnvimr', -- File search
+        'kevinhwang91/rnvimr', -- File browser
         config = get_config('ranger'),
     })
     use({
