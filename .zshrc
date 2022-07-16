@@ -3,12 +3,9 @@ export ZSH="$HOME/.oh-my-zsh"
 ZSH_THEME="common"
 ZSH_DISABLE_COMPFIX=true
 
-export NVM_LAZY_LOAD=true
-export NVM_COMPLETION=true
 plugins=(
     git
-    zsh-nvm
-    Zsh-syntax-highlighting
+    zsh-syntax-highlighting
 )
 
 export EDITOR="nvim"
@@ -21,3 +18,10 @@ precmd() { echo -en "\033]0;$(basename `pwd`)\a" } # title bar prompt
 # Aliases
 alias vi="nvim"
 alias vim="nvim"
+alias cb="xclip -sel c <"
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+export PATH=$PATH:$HOME/scripts
