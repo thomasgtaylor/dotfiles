@@ -1,0 +1,54 @@
+#!/bin/bash
+
+usage() {
+    echo "Usage: $0 [-hk] [-s query]" 1>&2
+    echo "  -h        usage"
+    echo "  -k        kill Firefox"
+    echo "  -s query  specify search query"
+}
+
+exit_abnormal() {
+    usage
+    exit 1
+}
+
+close() {
+    pgrep firefox 2> /dev/null
+    [[ $? == 1 ]] && exit 0
+    pkill -15 firefox 2> /dev/null
+}
+
+open() {
+    local url="$1"
+    if [[ -z "$url" ]]; then
+        url="about:newtab"
+    fi
+    firefox $url &> /dev/null & disown
+}
+
+search() {
+    local query="$1"
+    local encoded_url=$(jq -nRr --arg s "$query" '$s|@uri')
+    open https://duckduckgo.com/?q=$encoded_url
+}
+
+while getopts "hks:" o; do
+    case "$o" in
+        h) usage && exit 0 ;;
+        s) query=${OPTARG} ;;
+        k) killflag=1 ;;
+        *) exit_abnormal ;;
+    esac
+done
+
+if [[ $killflag -eq 1 ]]; then
+    close
+    exit 0
+fi
+
+if [[ ! -z "$query" ]]; then
+    search "$query"
+    exit 0
+fi
+
+open "$*"
