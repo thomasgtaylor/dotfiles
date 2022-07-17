@@ -18,6 +18,7 @@ precmd() { echo -en "\033]0;$(basename `pwd`)\a" } # title bar prompt
 # Aliases
 alias vi="nvim"
 alias vim="nvim"
+alias cat="bat"
 alias cb="xclip -sel c <"
 
 export NVM_DIR="$HOME/.nvm"
