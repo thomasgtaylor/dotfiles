@@ -1,8 +1,11 @@
 [alias]
+    amend = commit --amend --no-edit
+    co = checkout
+    s = status
     unadd = reset
     uncommit = reset HEAD^
-    amend = commit --amend --no-edit
-    s = status
+[core]
+    editor = nvim
 [diff]
     noprefix = true
 [pager]
