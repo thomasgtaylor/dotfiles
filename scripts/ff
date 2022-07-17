@@ -15,7 +15,7 @@ usage() {
     echo "  Examples:                                                   "
     echo "    ff (opens blank tab)                                      "
     echo "    ff how.wtf (opens how.wtf in new tab)                     "
-    echo "    ff -s \"test search\" (opens "test search" in duckduckgo) "
+    echo "    ff -s 'test search' (opens 'test search' in duckduckgo)   "
     echo "    ff -k (kills all Firefox browsers)                        "
     echo "    ff -h (shows this menu)                                   "
 }
