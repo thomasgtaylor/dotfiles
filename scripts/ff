@@ -20,11 +20,6 @@ usage() {
     echo "    ff -h (shows this menu)                                   "
 }
 
-exit_abnormal() {
-    usage
-    exit 1
-}
-
 close() {
     pgrep firefox 2> /dev/null
     [[ $? == 1 ]] && exit 0
@@ -50,7 +45,7 @@ while getopts "hks:" o; do
         h) usage && exit 0 ;;
         s) query=${OPTARG} ;;
         k) killflag=1 ;;
-        *) exit_abnormal ;;
+        *) usage && exit 1 ;;
     esac
 done
 
