@@ -43,9 +43,8 @@ packer.startup(function(use)
         requires = { 'nvim-lua/plenary.nvim' },
         config = get_config('telescope'),
     })
-    use({
-        'kevinhwang91/rnvimr', -- File browser
-        config = get_config('ranger'),
+    use({ 
+        "nvim-telescope/telescope-file-browser.nvim" -- File browser
     })
     use({
         'neovim/nvim-lspconfig', -- Language Server Protocol
