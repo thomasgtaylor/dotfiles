@@ -1,6 +1,6 @@
 [alias]
     amend = commit --amend --no-edit
-    co = checkout
+    b = branch
     s = status
     unadd = reset
     uncommit = reset HEAD^
@@ -10,3 +10,5 @@
     noprefix = true
 [pager]
     branch = false
+[user]
+    name = Thomas Taylor
