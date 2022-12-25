@@ -15,9 +15,10 @@ packer.startup(function(use)
     use({ 
         'wbthomason/packer.nvim', -- Package manager 
     })
-    use({
-        'ellisonleao/gruvbox.nvim', -- Theme
-        config = get_config('gruvbox'),
+    use({ 
+        'catppuccin/nvim', -- Theme
+        as = "catppuccin",
+        config = get_config('catppuccin')
     })
     use({
         'lewis6991/gitsigns.nvim', -- VCS gutter
@@ -36,7 +37,7 @@ packer.startup(function(use)
         tag = 'v2.*',
         requires = { 'kyazdani42/nvim-web-devicons' },
         config = get_config('bufferline'),
-        after = 'gruvbox.nvim',
+        after = 'catppuccin',
     })
     use({
         'nvim-telescope/telescope.nvim', -- File search
