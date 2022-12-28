@@ -7,9 +7,10 @@ set -g NNN_FCOLORS "BABA6F7300737300AE73BA73"
 
 set -gx EDITOR nvim
 set -gx VISUAL nvim
+set -g fish_greeting
 
 alias vi="nvim"
 alias vim="nvim"
 alias cat="bat"
 
-fish_add_path $HOME/bin
+fish_add_path $HOME/.scripts
