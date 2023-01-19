@@ -3,11 +3,11 @@ set -g fish_prompt_pwd_dir_length 0
 set -g hydro_color_prompt "E5C890"
 set -g hydro_color_pwd "A6D189"
 set -g hydro_color_git "F4B8E4"
-set -g NNN_FCOLORS "BABA6F7300737300AE73BA73"
+set -g fish_greeting
 
+set -gx NNN_FCOLORS "BABA6F7300737300AE73BA73"
 set -gx EDITOR nvim
 set -gx VISUAL nvim
-set -g fish_greeting
 
 alias vi="nvim"
 alias vim="nvim"
