@@ -25,6 +25,10 @@ packer.startup(function(use)
         config = get_config('gitsigns'),
     })
     use({
+        'sindrets/diffview.nvim', -- Git diff helper
+        requires = 'nvim-lua/plenary.nvim'
+    })
+    use({
         'numtostr/BufOnly.nvim', -- Close all buffers except current
     }) 	
     use({
