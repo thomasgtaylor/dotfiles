@@ -5,7 +5,6 @@ set -g hydro_color_pwd "A6D189"
 set -g hydro_color_git "F4B8E4"
 set -g fish_greeting
 
-set -gx NNN_FCOLORS "BABA6F7300737300AE73BA73"
 set -gx EDITOR nvim
 set -gx VISUAL nvim
 
