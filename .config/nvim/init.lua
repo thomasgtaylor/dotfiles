@@ -81,6 +81,13 @@ require('lazy').setup({
 
   -- Version control
   { 'lewis6991/gitsigns.nvim', event = 'VeryLazy' },
+  {
+    'f-person/git-blame.nvim',
+    event = 'VeryLazy',
+    init = function()
+      vim.g.gitblame_enabled = 0
+    end,
+  },
 
   -- Buffer management
   { 'numtostr/BufOnly.nvim', cmd = 'BufOnly' },
