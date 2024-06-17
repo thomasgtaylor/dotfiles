@@ -1,0 +1,11 @@
+blinking-cursor = false
+cursor = '▇'
+option-as-alt = 'left'
+theme = "catppuccin-frappe"
+
+[fonts]
+family = "FiraCode Nerd Font Mono"
+size = 22
+
+[navigation]
+mode = "BottomTab"
