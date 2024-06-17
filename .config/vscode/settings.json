@@ -2,6 +2,7 @@
 	"breadcrumbs.enabled": false,
 	"editor.fontFamily": "FiraCodeNerdFontMono-Retina",
 	"editor.fontLigatures": true,
+	"editor.fontSize": 14,
 	"editor.fontWeight": "400",
 	"editor.inlineSuggest.enabled": true,
 	"editor.inlineSuggest.suppressSuggestions": true,
@@ -10,6 +11,12 @@
 	"editor.scrollbar.verticalScrollbarSize": 10,
 	"editor.stickyScroll.enabled": false,
 	"explorer.confirmDragAndDrop": false,
+	"files.watcherExclude": {
+		"**/.git/objects/**": true,
+		"**/.git/subtree-cache/**": true,
+		"**/node_modules/*/**": true,
+		"**/.hg/store/**": true
+	},
 	"git.autofetch": true,
 	"git.openRepositoryInParentFolders": "never",
 	"github.copilot.advanced": {},
@@ -101,12 +108,13 @@
 	"window.commandCenter": false,
 	"window.density.editorTabHeight": "compact",
 	"window.title": "👻",
-	"window.zoomLevel": 2,
-	"workbench.activityBar.location": "hidden",
+	"window.zoomLevel": 1,
 	"workbench.colorTheme": "Catppuccin Frappé",
 	"workbench.editor.editorActionsLocation": "hidden",
 	"workbench.editor.enablePreview": false,
 	"workbench.iconTheme": "vscode-great-icons",
 	"workbench.layoutControl.enabled": false,
-	"workbench.statusBar.visible": false
+	"workbench.statusBar.visible": false,
+	"redhat.telemetry.enabled": false,
+	"workbench.activityBar.location": "hidden"
 }
