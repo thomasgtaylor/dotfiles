@@ -116,5 +116,5 @@
 	"workbench.layoutControl.enabled": false,
 	"workbench.statusBar.visible": false,
 	"redhat.telemetry.enabled": false,
-	"workbench.activityBar.location": "hidden"
+	"workbench.activityBar.location": "bottom"
 }
