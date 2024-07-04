@@ -9,3 +9,7 @@ size = 22
 
 [navigation]
 mode = "BottomTab"
+
+[shell]
+program = "/opt/homebrew/bin/fish"
+args = []
