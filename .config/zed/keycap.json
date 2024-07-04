@@ -1,0 +1,23 @@
+[
+  {
+    "context": "Editor",
+    "bindings": {
+      "cmd-e": "project_panel::ToggleFocus"
+    }
+  },
+  {
+    "context": "Workspace",
+    "bindings": {
+      "cmd-e": "project_panel::ToggleFocus"
+    }
+  },
+  {
+    "context": "Editor && vim_mode == normal && !VimWaiting && !menu",
+    "bindings": {
+      "c ]": "editor::GoToHunk",
+      "c [": "editor::GoToPrevHunk",
+      "shift-j": "pane::ActivatePrevItem",
+      "shift-k": "pane::ActivateNextItem"
+    }
+  }
+]
