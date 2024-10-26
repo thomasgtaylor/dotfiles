@@ -1,11 +1,13 @@
-blinking-cursor = false
-cursor = '▇'
 option-as-alt = 'left'
 theme = "catppuccin-frappe"
 
+[cursor]
+style = "Block"
+blinking = false
+
 [fonts]
 family = "FiraCode Nerd Font Mono"
-size = 22
+size = 18
 
 [navigation]
 mode = "BottomTab"
