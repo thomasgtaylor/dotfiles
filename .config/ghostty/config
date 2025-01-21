@@ -1,0 +1,10 @@
+theme = "catppuccin-frappe"
+
+font-family = "FiraCode Nerd Font Mono"
+font-size = "18"
+
+shell-integration-features = no-cursor
+cursor-style = "block"
+
+macos-titlebar-style = "tabs"
+macos-titlebar-proxy-icon = "hidden"
