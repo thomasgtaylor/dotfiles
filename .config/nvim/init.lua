@@ -1,6 +1,6 @@
 -- Plugin manager initialization
 local lazypath = vim.fn.stdpath('data') .. '/lazy/lazy.nvim'
-if not vim.loop.fs_stat(lazypath) then
+if not vim.uv.fs_stat(lazypath) then
     vim.fn.system({
         'git',
         'clone',
@@ -14,20 +14,23 @@ vim.opt.rtp:prepend(lazypath)
 
 -- Mappings
 vim.g.mapleader = ','
-vim.keymap.set('n', '<Leader><Space>', ':nohls<CR>')
-vim.keymap.set('n', '<C-k>', ':wincmd k<CR>')
-vim.keymap.set('n', '<C-j>', ':wincmd j<CR>')
-vim.keymap.set('n', '<C-h>', ':wincmd h<CR>')
-vim.keymap.set('n', '<C-l>', ':wincmd l<CR>')
-vim.keymap.set("n", "<D-p>", "<cmd>Telescope find_files<CR>")
-vim.keymap.set("n", "<DS-F>", "<cmd>Telescope live_grep<CR>")
-vim.keymap.set("n", "<DA-T>", "<cmd>BufOnly<CR>")
-vim.keymap.set('n', '<S-j>', ':bp<CR>')
-vim.keymap.set('n', '<S-k>', ':bn<CR>')
-vim.keymap.set('n', '<C-u>', '<C-u>zz')
-vim.keymap.set('n', '<C-d>', '<C-d>zz')
-vim.keymap.set('n', 'n', 'nzz')
-vim.keymap.set('n', 'N', 'Nzz')
+vim.keymap.set('n', '<Leader><Space>', ':nohls<CR>', { silent = true })
+vim.keymap.set('n', '<C-k>', ':wincmd k<CR>', { silent = true })
+vim.keymap.set('n', '<C-j>', ':wincmd j<CR>', { silent = true })
+vim.keymap.set('n', '<C-h>', ':wincmd h<CR>', { silent = true })
+vim.keymap.set('n', '<C-l>', ':wincmd l<CR>', { silent = true })
+vim.keymap.set('n', '<leader>ff', '<cmd>Telescope find_files<CR>', { silent = true })
+vim.keymap.set('n', '<leader>fg', '<cmd>Telescope live_grep<CR>', { silent = true })
+vim.keymap.set('n', '<leader>fb', '<cmd>Telescope buffers<CR>', { silent = true })
+vim.keymap.set('n', '<leader>bo', '<cmd>BufOnly<CR>', { silent = true })
+vim.keymap.set('n', '<S-j>', ':bp<CR>', { silent = true })
+vim.keymap.set('n', '<S-k>', ':bn<CR>', { silent = true })
+vim.keymap.set('n', '<C-u>', '<C-u>zz', { silent = true })
+vim.keymap.set('n', '<C-d>', '<C-d>zz', { silent = true })
+vim.keymap.set('n', 'n', 'nzz', { silent = true })
+vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { silent = true })
+vim.keymap.set('n', 'N', 'Nzz', { silent = true })
+
 
 -- Options
 vim.opt.background = 'dark'
@@ -63,12 +66,12 @@ require('lazy').setup({
         lazy = false,
         version = '*',
         dependencies = {
-            'kyazdani42/nvim-web-devicons',
+            'nvim-tree/nvim-web-devicons',
             'catppuccin/nvim',
         },
         config = function()
             require('bufferline').setup {
-                highlights = require('catppuccin.groups.integrations.bufferline').get(),
+                highlights = require('catppuccin.special.bufferline').get_theme(),
                 options = {
                     show_buffer_close_icons = false,
                 },
@@ -101,30 +104,86 @@ require('lazy').setup({
       dependencies = { 'nvim-lua/plenary.nvim' }
     },
 
-    -- Code editing
+    -- File management
     {
-        'williamboman/mason.nvim',
-        config = function()
-            require("mason").setup()
-        end,
+        'stevearc/oil.nvim',
+        lazy = false,
+        dependencies = { 'nvim-tree/nvim-web-devicons' },
+        keys = {
+            { '-', '<cmd>Oil<CR>', desc = 'Open parent directory' },
+        },
+        opts = {},
     },
+
+    -- Session management
     {
-        'VonHeikemen/lsp-zero.nvim',
-        branch = 'v3.x',
-        config = function()
-            local lsp_zero = require('lsp-zero')
-            lsp_zero.extend_lspconfig()
-            lsp_zero.on_attach(function(client, bufnr)
-                lsp_zero.default_keymaps({ buffer = bufnr })
-            end)
-        end,
+        'folke/persistence.nvim',
+        event = 'BufReadPre',
+        opts = {},
     },
+
+    -- Copilot
+    { 'github/copilot.vim' },
+
+    -- Markdown
+    {
+      "iamcco/markdown-preview.nvim",
+      ft = "markdown",
+      build = ":call mkdp#util#install()",
+    },
+
+    -- Comments
+    { 'numToStr/Comment.nvim' },
+
+    -- LSP
     { 'neovim/nvim-lspconfig' },
-    { 'hrsh7th/nvim-cmp' },
-    { 'hrsh7th/cmp-nvim-lsp' },
-    { 'L3MON4D3/LuaSnip' },
+    {
+        'hrsh7th/nvim-cmp',
+        dependencies = {
+            'hrsh7th/cmp-nvim-lsp',
+        },
+        config = function()
+            local cmp = require('cmp')
+            cmp.setup({
+                sources = {
+                    { name = 'nvim_lsp' },
+                },
+                mapping = cmp.mapping.preset.insert({
+                    ['<CR>'] = cmp.mapping.confirm({ select = true }),
+                    ['<C-Space>'] = cmp.mapping.complete(),
+                    ['<Tab>'] = cmp.mapping(function(fallback)
+                        if cmp.visible() then
+                            cmp.select_next_item()
+                        else
+                            fallback()
+                        end
+                    end, { 'i', 's' }),
+                    ['<S-Tab>'] = cmp.mapping(function(fallback)
+                        if cmp.visible() then
+                            cmp.select_prev_item()
+                        else
+                            fallback()
+                        end
+                    end, { 'i', 's' }),
+                }),
+            })
+        end,
+    },
 })
 
-local lspconfig = require('lspconfig')
-lspconfig.pyright.setup {}
-lspconfig.ruff.setup {}
+-- LSP
+vim.api.nvim_create_autocmd('LspAttach', {
+    callback = function(args)
+        local opts = { buffer = args.buf, silent = true }
+        vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)
+        vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, opts)
+        vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, opts)
+        vim.keymap.set('n', 'gr', vim.lsp.buf.references, opts)
+        vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, opts)
+        vim.keymap.set('n', '<leader>ca', vim.lsp.buf.code_action, opts)
+        vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, opts)
+        vim.keymap.set('n', ']d', vim.diagnostic.goto_next, opts)
+    end,
+})
+
+-- vim.lsp.enable({ 'pyright', 'ruff' })
