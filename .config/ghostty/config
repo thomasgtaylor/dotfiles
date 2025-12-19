@@ -9,3 +9,4 @@ cursor-style-blink = false
 
 macos-titlebar-style = "tabs"
 macos-titlebar-proxy-icon = "hidden"
+keybind = shift+enter=text:\x1b\r
