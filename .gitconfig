@@ -1,15 +1,8 @@
 [alias]
-    amend = commit --amend --no-edit
     b = branch
     s = status
     unadd = reset
     uncommit = reset HEAD^
-    a = add .
-    c = commit
-    ps = push
-    pl = pull
-    at = !git add . && git commit -m "🧪" && git push
-    co = checkout
 [core]
     editor = nvim
 [diff]
