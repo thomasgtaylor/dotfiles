@@ -1,3 +1,13 @@
+-- Dependencies (one-time setup):
+--   brew install tree-sitter-cli    (treesitter parser compilation)
+--   brew install ripgrep            (telescope live_grep)
+--   pip install pyright ruff        (LSP servers)
+--   :Copilot setup                  (GitHub authentication)
+
+-- Language configuration
+local lsp_servers = { 'pyright', 'ruff' }
+local treesitter_parsers = { 'python', 'lua' }
+
 -- Plugin manager initialization
 local lazypath = vim.fn.stdpath('data') .. '/lazy/lazy.nvim'
 if not vim.uv.fs_stat(lazypath) then
@@ -78,6 +88,11 @@ require('lazy').setup({
             }
         end,
     },
+    {
+        'nvim-lualine/lualine.nvim',
+        dependencies = { 'nvim-tree/nvim-web-devicons' },
+        opts = {},
+    },
 
     -- Version control
     {
@@ -123,7 +138,7 @@ require('lazy').setup({
     },
 
     -- Copilot
-    { 'github/copilot.vim' },
+    { 'github/copilot.vim' }, 
 
     -- Markdown
     {
@@ -134,6 +149,16 @@ require('lazy').setup({
 
     -- Comments
     { 'numToStr/Comment.nvim' },
+
+    -- Syntax highlighting
+    {
+        'nvim-treesitter/nvim-treesitter',
+        lazy = false,
+        build = ':TSUpdate',
+        config = function()
+            require('nvim-treesitter').install(treesitter_parsers)
+        end,
+    },
 
     -- LSP
     { 'neovim/nvim-lspconfig' },
@@ -171,7 +196,7 @@ require('lazy').setup({
     },
 })
 
--- LSP
+-- LSP (native Neovim 0.11+ API)
 vim.api.nvim_create_autocmd('LspAttach', {
     callback = function(args)
         local opts = { buffer = args.buf, silent = true }
@@ -186,4 +211,9 @@ vim.api.nvim_create_autocmd('LspAttach', {
     end,
 })
 
--- vim.lsp.enable({ 'pyright', 'ruff' })
+vim.lsp.enable(lsp_servers)
+
+-- Treesitter highlighting (auto-enables for any filetype with a parser)
+vim.api.nvim_create_autocmd('FileType', {
+    callback = function() pcall(vim.treesitter.start) end,
+})
