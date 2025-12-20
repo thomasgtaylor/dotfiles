@@ -1,7 +1,6 @@
 -- Dependencies (one-time setup):
 --   brew install tree-sitter-cli    (treesitter parser compilation)
 --   brew install ripgrep            (telescope live_grep)
---   pip install pyright ruff        (LSP servers)
 --   :Copilot setup                  (GitHub authentication)
 
 -- Language configuration
@@ -115,7 +114,7 @@ require('lazy').setup({
     -- Browser
     {
       'nvim-telescope/telescope.nvim',
-      tag = '0.1.8',
+      branch = 'master',
       dependencies = { 'nvim-lua/plenary.nvim' }
     },
 
