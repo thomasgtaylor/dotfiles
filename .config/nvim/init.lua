@@ -5,7 +5,7 @@
 
 -- Language configuration
 local lsp_servers = { 'pyright', 'ruff' }
-local treesitter_parsers = { 'python', 'lua' }
+local treesitter_parsers = { 'python', 'lua', 'terraform' }
 
 -- Plugin manager initialization
 local lazypath = vim.fn.stdpath('data') .. '/lazy/lazy.nvim'
@@ -31,7 +31,6 @@ vim.keymap.set('n', '<C-l>', ':wincmd l<CR>', { silent = true })
 vim.keymap.set('n', '<leader>fs', '<cmd>Telescope find_files<CR>', { silent = true })
 vim.keymap.set('n', '<leader>fg', '<cmd>Telescope live_grep<CR>', { silent = true })
 vim.keymap.set('n', '<leader>fb', '<cmd>Telescope buffers<CR>', { silent = true })
-vim.keymap.set('n', '<leader>bo', '<cmd>BufOnly<CR>', { silent = true })
 vim.keymap.set('n', '<S-j>', ':bp<CR>', { silent = true })
 vim.keymap.set('n', '<S-k>', ':bn<CR>', { silent = true })
 vim.keymap.set('n', '<C-u>', '<C-u>zz', { silent = true })
@@ -97,7 +96,14 @@ require('lazy').setup({
     {
         'lewis6991/gitsigns.nvim',
         config = function()
-            require('gitsigns').setup()
+            require('gitsigns').setup({
+                on_attach = function(bufnr)
+                    local gs = require('gitsigns')
+                    local opts = { buffer = bufnr, silent = true }
+                    vim.keymap.set('n', ']c', gs.next_hunk, opts)
+                    vim.keymap.set('n', '[c', gs.prev_hunk, opts)
+                end,
+            })
         end,
     },
     {
@@ -108,8 +114,6 @@ require('lazy').setup({
         end,
     },
 
-    -- Buffer management
-    { 'numtostr/BufOnly.nvim', cmd = 'BufOnly' },
 
     -- Browser
     {
@@ -120,13 +124,29 @@ require('lazy').setup({
 
     -- File management
     {
-        'stevearc/oil.nvim',
+        'folke/snacks.nvim',
         lazy = false,
-        dependencies = { 'nvim-tree/nvim-web-devicons' },
-        keys = {
-            { '-', '<cmd>Oil<CR>', desc = 'Open parent directory' },
+        opts = {
+            bigfile = { enabled = false },
+            bufdelete = { enabled = true },
+            dashboard = { enabled = false },
+            indent = { enabled = false },
+            input = { enabled = false },
+            lazygit = { enabled = true },
+            notifier = { enabled = false },
+            quickfile = { enabled = false },
+            scope = { enabled = false },
+            scroll = { enabled = false },
+            statuscolumn = { enabled = false },
+            words = { enabled = false },
+            explorer = { enabled = true },
         },
-        opts = {},
+        keys = {
+            { '<leader>bd', function() Snacks.bufdelete() end, desc = 'Delete Buffer' },
+            { '<leader>bo', function() Snacks.bufdelete.other() end, desc = 'Delete Other Buffers' },
+            { '<leader>fe', function() Snacks.explorer() end, desc = 'File Explorer' },
+            { '<leader>lg', function() Snacks.lazygit() end, desc = 'LazyGit' },
+        },
     },
 
     -- Session management
