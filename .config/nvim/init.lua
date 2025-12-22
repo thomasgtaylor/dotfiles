@@ -131,7 +131,7 @@ require('lazy').setup({
             bufdelete = { enabled = true },
             dashboard = { enabled = false },
             indent = { enabled = false },
-            input = { enabled = false },
+            input = { enabled = true },
             lazygit = { enabled = true },
             notifier = { enabled = false },
             quickfile = { enabled = false },
