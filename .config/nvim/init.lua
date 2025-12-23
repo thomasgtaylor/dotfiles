@@ -149,13 +149,6 @@ require('lazy').setup({
         },
     },
 
-    -- Session management
-    {
-        'folke/persistence.nvim',
-        event = 'BufReadPre',
-        opts = {},
-    },
-
     -- Copilot
     { 'github/copilot.vim' }, 
 
