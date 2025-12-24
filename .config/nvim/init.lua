@@ -1,6 +1,7 @@
 -- Dependencies (one-time setup):
 --   brew install tree-sitter-cli    (treesitter parser compilation)
 --   brew install ripgrep            (telescope live_grep)
+--   brew install fd                 (snacks.nvim file explorer)
 --   :Copilot setup                  (GitHub authentication)
 
 -- Language configuration
@@ -38,6 +39,27 @@ vim.keymap.set('n', '<C-d>', '<C-d>zz', { silent = true })
 vim.keymap.set('n', 'n', 'nzz', { silent = true })
 vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { silent = true })
 vim.keymap.set('n', 'N', 'Nzz', { silent = true })
+vim.keymap.set('n', '<leader>q', ':q<CR>', { silent = true })
+vim.keymap.set('n', '<leader>qa', ':qa<CR>', { silent = true })
+vim.keymap.set('n', '<leader>w', ':w<CR>', { silent = true })
+local session_dir = vim.fn.stdpath('data') .. '/sessions/'
+local function get_session_file()
+  local cwd = vim.fn.fnamemodify(vim.fn.getcwd(), ':t')
+  return session_dir .. cwd .. '.vim'
+end
+vim.keymap.set('n', '<leader>ms', function()
+  vim.fn.mkdir(session_dir, 'p')
+  vim.cmd('mksession! ' .. get_session_file())
+  print('Session saved')
+end, { silent = true })
+vim.keymap.set('n', '<leader>ls', function()
+  local file = get_session_file()
+  if vim.fn.filereadable(file) == 1 then
+    vim.cmd('source ' .. file)
+  else
+    print('No session for this project')
+  end
+end, { silent = true })
 
 
 -- Options
