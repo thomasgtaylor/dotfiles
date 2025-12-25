@@ -1,8 +1,7 @@
 -- Dependencies (one-time setup):
 --   brew install tree-sitter-cli    (treesitter parser compilation)
 --   brew install ripgrep            (telescope live_grep)
---   brew install fd                 (snacks.nvim file explorer)
---   :Copilot setup                  (GitHub authentication)
+--   :Copilot auth                   (GitHub authentication)
 
 -- Language configuration
 local lsp_servers = { 'pyright', 'ruff' }
@@ -146,33 +145,54 @@ require('lazy').setup({
 
     -- File management
     {
-        'folke/snacks.nvim',
+        'nvim-mini/mini.bufremove',
+        config = function()
+            require('mini.bufremove').setup()
+            vim.keymap.set('n', '<leader>bd', function() require('mini.bufremove').delete() end, { silent = true, desc = 'Delete Buffer' })
+            vim.keymap.set('n', '<leader>bo', function()
+                local current = vim.api.nvim_get_current_buf()
+                for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+                    if buf ~= current and vim.api.nvim_buf_is_loaded(buf) then
+                        require('mini.bufremove').delete(buf)
+                    end
+                end
+            end, { silent = true, desc = 'Delete Other Buffers' })
+        end,
+    },
+    {
+        'nvim-neo-tree/neo-tree.nvim',
+        branch = 'v3.x',
         lazy = false,
-        opts = {
-            bigfile = { enabled = false },
-            bufdelete = { enabled = true },
-            dashboard = { enabled = false },
-            indent = { enabled = false },
-            input = { enabled = true },
-            lazygit = { enabled = true },
-            notifier = { enabled = false },
-            quickfile = { enabled = false },
-            scope = { enabled = false },
-            scroll = { enabled = false },
-            statuscolumn = { enabled = false },
-            words = { enabled = false },
-            explorer = { enabled = true },
+        dependencies = {
+            'nvim-lua/plenary.nvim',
+            'MunifTanjim/nui.nvim',
+            'nvim-tree/nvim-web-devicons',
         },
-        keys = {
-            { '<leader>bd', function() Snacks.bufdelete() end, desc = 'Delete Buffer' },
-            { '<leader>bo', function() Snacks.bufdelete.other() end, desc = 'Delete Other Buffers' },
-            { '<leader>fe', function() Snacks.explorer() end, desc = 'File Explorer' },
-            { '<leader>lg', function() Snacks.lazygit() end, desc = 'LazyGit' },
-        },
+        config = function()
+            require('neo-tree').setup({})
+            vim.keymap.set('n', '<leader>fe', '<cmd>Neotree toggle<CR>', { silent = true })
+        end,
     },
 
     -- Copilot
-    { 'github/copilot.vim' }, 
+    {
+        'zbirenbaum/copilot.lua',
+        cmd = 'Copilot',
+        event = 'InsertEnter',
+        config = function()
+            require('copilot').setup({
+                suggestion = { enabled = false },
+                panel = { enabled = false },
+            })
+        end,
+    },
+    {
+        'zbirenbaum/copilot-cmp',
+        dependencies = { 'zbirenbaum/copilot.lua' },
+        config = function()
+            require('copilot_cmp').setup()
+        end,
+    },
 
     -- Markdown
     {
@@ -205,6 +225,7 @@ require('lazy').setup({
             local cmp = require('cmp')
             cmp.setup({
                 sources = {
+                    { name = 'copilot' },
                     { name = 'nvim_lsp' },
                 },
                 mapping = cmp.mapping.preset.insert({
@@ -251,3 +272,4 @@ vim.lsp.enable(lsp_servers)
 vim.api.nvim_create_autocmd('FileType', {
     callback = function() pcall(vim.treesitter.start) end,
 })
+
