@@ -31,6 +31,7 @@ vim.keymap.set('n', '<C-l>', ':wincmd l<CR>', { silent = true })
 vim.keymap.set('n', '<leader>fs', '<cmd>Telescope find_files<CR>', { silent = true })
 vim.keymap.set('n', '<leader>fg', '<cmd>Telescope live_grep<CR>', { silent = true })
 vim.keymap.set('n', '<leader>fb', '<cmd>Telescope buffers<CR>', { silent = true })
+vim.keymap.set('n', '<leader>gs', '<cmd>Telescope git_status<CR>', { silent = true })
 vim.keymap.set('n', '<S-j>', ':bp<CR>', { silent = true })
 vim.keymap.set('n', '<S-k>', ':bn<CR>', { silent = true })
 vim.keymap.set('n', '<C-u>', '<C-u>zz', { silent = true })
@@ -169,7 +170,13 @@ require('lazy').setup({
             'nvim-tree/nvim-web-devicons',
         },
         config = function()
-            require('neo-tree').setup({})
+            require('neo-tree').setup({
+              filesystem = {
+                follow_current_file = {
+                  enabled = true,
+                },
+              },
+            })
             vim.keymap.set('n', '<leader>fe', '<cmd>Neotree toggle<CR>', { silent = true })
         end,
     },
@@ -192,13 +199,6 @@ require('lazy').setup({
         config = function()
             require('copilot_cmp').setup()
         end,
-    },
-
-    -- Markdown
-    {
-      "iamcco/markdown-preview.nvim",
-      ft = "markdown",
-      build = ":call mkdp#util#install()",
     },
 
     -- Comments
@@ -272,4 +272,3 @@ vim.lsp.enable(lsp_servers)
 vim.api.nvim_create_autocmd('FileType', {
     callback = function() pcall(vim.treesitter.start) end,
 })
-
