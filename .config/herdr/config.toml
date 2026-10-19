@@ -1,0 +1,26 @@
+onboarding = false
+
+[keys]
+prefix = "ctrl+a"
+
+[theme]
+name = "one-light"
+auto_switch = false
+
+[[keys.command]]
+key = "prefix+shift+g"
+type = "plugin_action"
+command = "worktrunk.open"
+description = "Worktrunk: switch / create worktree"
+
+[[keys.command]]
+key = "cmd+r"
+type = "plugin_action"
+command = "persiyanov.reviewr.toggle"
+description = "Reviewr: toggle review pane"
+
+[[keys.command]]
+key = "prefix+k"
+type = "plugin_action"
+command = "herdr-bar.open"
+description = "Herdr Bar: command bar"
