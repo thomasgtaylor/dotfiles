@@ -1,7 +1,7 @@
-theme = "catppuccin-frappe"
-
+theme = Atom One Light
 font-family = "FiraCode Nerd Font Mono"
 font-size = "18"
+font-thicken = true
 
 shell-integration-features = no-cursor
 cursor-style = "block"

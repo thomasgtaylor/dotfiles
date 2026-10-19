@@ -63,7 +63,7 @@ end, { silent = true })
 
 
 -- Options
-vim.opt.background = 'dark'
+vim.opt.background = 'light'
 vim.opt.clipboard:prepend { 'unnamedplus' }
 vim.opt.cursorline = true
 vim.opt.completeopt = { 'menu', 'menuone', 'noselect' }
@@ -84,11 +84,11 @@ vim.opt.wrap = false
 require('lazy').setup({
     -- UI
     {
-        'catppuccin/nvim',
+        'rakr/vim-one',
         lazy = false,
         priority = 1000,
         config = function()
-            vim.cmd.colorscheme 'catppuccin-frappe'
+            vim.cmd.colorscheme 'one'
         end,
     },
     {
@@ -97,11 +97,10 @@ require('lazy').setup({
         version = '*',
         dependencies = {
             'nvim-tree/nvim-web-devicons',
-            'catppuccin/nvim',
+            'rakr/vim-one',
         },
         config = function()
             require('bufferline').setup {
-                highlights = require('catppuccin.special.bufferline').get_theme(),
                 options = {
                     show_buffer_close_icons = false,
                 },
@@ -111,7 +110,7 @@ require('lazy').setup({
     {
         'nvim-lualine/lualine.nvim',
         dependencies = { 'nvim-tree/nvim-web-devicons' },
-        opts = {},
+        opts = { options = { theme = 'auto' } },
     },
 
     -- Version control
