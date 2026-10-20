@@ -10,3 +10,5 @@ cursor-style-blink = false
 macos-titlebar-style = "tabs"
 macos-titlebar-proxy-icon = "hidden"
 keybind = shift+enter=text:\x1b\r
+keybind = ctrl+tab=csi:9;5u
+keybind = ctrl+shift+tab=csi:9;6u

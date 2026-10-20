@@ -2,6 +2,8 @@ onboarding = false
 
 [keys]
 prefix = "ctrl+a"
+next_tab = ["prefix+n", "ctrl+tab"]
+previous_tab = ["prefix+p", "ctrl+shift+tab"]
 
 [theme]
 name = "one-light"
@@ -20,7 +22,7 @@ command = "persiyanov.reviewr.toggle"
 description = "Reviewr: toggle review pane"
 
 [[keys.command]]
-key = "prefix+k"
+key = "cmd+p"
 type = "plugin_action"
 command = "herdr-bar.open"
 description = "Herdr Bar: command bar"
