@@ -16,4 +16,6 @@ keybind = super+]=csi:93;9u
 keybind = super+[=csi:91;9u
 keybind = alt+bracket_right=csi:93;3u
 keybind = alt+bracket_left=csi:91;3u
-keybind = super+t=unbind
+keybind = super+p=csi:112;9u
+keybind = super+r=csi:114;9u
+keybind = super+t=csi:116;9u
