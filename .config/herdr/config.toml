@@ -8,6 +8,7 @@ next_agent = "cmd+]"
 previous_agent = "cmd+["
 next_workspace = "alt+]"
 previous_workspace = "alt+["
+new_tab = ["prefix+c", "cmd+t"]
 
 [theme]
 name = "one-light"

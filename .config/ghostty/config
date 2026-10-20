@@ -16,3 +16,4 @@ keybind = super+bracket_right=unbind
 keybind = super+bracket_left=unbind
 keybind = alt+bracket_right=csi:93;3u
 keybind = alt+bracket_left=csi:91;3u
+keybind = super+t=unbind
