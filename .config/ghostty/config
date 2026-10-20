@@ -12,3 +12,7 @@ macos-titlebar-proxy-icon = "hidden"
 keybind = shift+enter=text:\x1b\r
 keybind = ctrl+tab=csi:9;5u
 keybind = ctrl+shift+tab=csi:9;6u
+keybind = super+bracket_right=unbind
+keybind = super+bracket_left=unbind
+keybind = alt+bracket_right=csi:93;3u
+keybind = alt+bracket_left=csi:91;3u

@@ -4,6 +4,10 @@ onboarding = false
 prefix = "ctrl+a"
 next_tab = ["prefix+n", "ctrl+tab"]
 previous_tab = ["prefix+p", "ctrl+shift+tab"]
+next_agent = "cmd+]"
+previous_agent = "cmd+["
+next_workspace = "alt+]"
+previous_workspace = "alt+["
 
 [theme]
 name = "one-light"
