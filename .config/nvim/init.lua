@@ -4,7 +4,7 @@
 --   :Copilot auth                   (GitHub authentication)
 
 -- Language configuration
-local lsp_servers = { 'pyright', 'ruff' }
+local lsp_servers = { 'ty', 'ruff' }
 local treesitter_parsers = { 'python', 'lua', 'terraform' }
 
 -- Plugin manager initialization
@@ -89,6 +89,7 @@ require('lazy').setup({
         priority = 1000,
         config = function()
             vim.cmd.colorscheme 'one'
+            vim.opt.background = 'light'
         end,
     },
     {
@@ -133,6 +134,10 @@ require('lazy').setup({
         init = function()
             vim.g.gitblame_enabled = 0
         end,
+    },
+    {
+        "dlyongemallo/diffview-plus.nvim",
+        version = "*",
     },
 
 
