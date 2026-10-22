@@ -5,9 +5,15 @@
     uncommit = reset HEAD^
 [core]
     editor = nvim
-[diff]
-    noprefix = true
 [pager]
     branch = false
 [user]
     name = Thomas Taylor
+    email = thomas.taylor@verifiable.com
+    signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFWYDofV7bv93qEMnQ25bnq2GZ124CsAWUYmryo1fS7Q
+[gpg]
+	format = ssh
+[gpg "ssh"]
+  program = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign"
+[commit]
+  gpgsign = true

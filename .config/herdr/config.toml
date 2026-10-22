@@ -31,3 +31,22 @@ key = "cmd+p"
 type = "plugin_action"
 command = "herdr-bar.open"
 description = "Herdr Bar: command bar"
+
+[ui]
+status_indicators = "dots"
+prompt_new_tab_name = false
+# Empty output keeps this refresh hook invisible in the tab bar.
+tab_bar_right = [
+  { type = "command", command = "bash ~/.config/herdr/pr-icons.sh", interval_seconds = 30, timeout_seconds = 25 },
+]
+
+[ui.sidebar.spaces]
+rows = [
+  ["state_icon", "workspace", { token = "$pr_icon", dim = false, rules = [
+    { equals = "", fg = "#1a7f37" },
+    { equals = "", fg = "#656d76" },
+    { equals = "", fg = "#8250df" },
+    { equals = "", fg = "#cf222e" },
+  ] }],
+  ["branch", "git_status"],
+]
