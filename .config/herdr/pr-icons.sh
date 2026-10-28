@@ -87,4 +87,15 @@ while IFS= read -r workspace; do
     "$herdr_bin" workspace report-metadata "$wid" --source user:pr-icons \
       --clear-token pr_icon >/dev/null || :
   fi
+  # Agent rows read pane metadata; mirror this Space's PR status to its panes.
+  while IFS= read -r pid; do
+    [[ -n "$pid" ]] || continue
+    if [[ -n "$icon" ]]; then
+      "$herdr_bin" pane report-metadata "$pid" --source user:pr-icons \
+        --token "pr_icon=$icon" --ttl-ms 90000 >/dev/null || :
+    else
+      "$herdr_bin" pane report-metadata "$pid" --source user:pr-icons \
+        --clear-token pr_icon >/dev/null || :
+    fi
+  done < <(jq -r --arg wid "$wid" '.panes[] | select(.workspace_id == $wid) | .pane_id' <<< "$snapshot")
 done <<< "$workspaces"
