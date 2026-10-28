@@ -50,3 +50,14 @@ rows = [
   ] }],
   ["branch", "git_status"],
 ]
+
+[ui.sidebar.agents]
+rows = [
+  ["state_icon", "machine", "workspace", "tab", { token = "$pr_icon", dim = false, rules = [
+    { equals = "", fg = "#1a7f37" },
+    { equals = "", fg = "#656d76" },
+    { equals = "", fg = "#8250df" },
+    { equals = "", fg = "#cf222e" },
+  ] }],
+  ["agent"],
+]
