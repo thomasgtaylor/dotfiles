@@ -1,6 +1,7 @@
 onboarding = false
 
 [keys]
+toggle_sidebar = ["prefix+b", "cmd+b"]
 prefix = "ctrl+a"
 next_tab = ["prefix+n", "ctrl+tab"]
 previous_tab = ["prefix+p", "ctrl+shift+tab"]
@@ -33,6 +34,7 @@ command = "herdr-bar.open"
 description = "Herdr Bar: command bar"
 
 [ui]
+sidebar_collapsed_mode = "hidden"
 status_indicators = "dots"
 prompt_new_tab_name = false
 # Empty output keeps this refresh hook invisible in the tab bar.
