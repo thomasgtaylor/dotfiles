@@ -28,7 +28,7 @@ command = "persiyanov.reviewr.toggle"
 description = "Reviewr: toggle review pane"
 
 [[keys.command]]
-key = "cmd+p"
+key = "cmd+k"
 type = "plugin_action"
 command = "herdr-bar.open"
 description = "Herdr Bar: command bar"
