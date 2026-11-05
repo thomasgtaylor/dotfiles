@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Herdr Space PR icons. Requires bash 3.2+, git, jq, authenticated gh, and herdr.
+# Herdr Space PR and human review icons. Requires bash 3.2+, git, jq, authenticated gh, and herdr.
 # Run through Herdr's periodic command hook (30s interval, 25s timeout).
 # Keep stdout empty: Herdr uses command output as visible tab-bar text.
 # Colors belong in config.toml; this script reports only Nerd Font glyphs.
@@ -33,12 +33,17 @@ github_branch() {
   jq -cn --arg repo "$repo" --arg branch "$branch" '{repo: $repo, branch: $branch}'
 }
 
-select_icon() {
-  jq -er --arg owner "$1" --arg branch "$2" '
+select_pr() {
+  jq -c --arg owner "$1" --arg branch "$2" '
     map(select(.headRefName == $branch and
       ((.headRepositoryOwner.login // "" | ascii_downcase) == ($owner | ascii_downcase))))
     | sort_by([(.state == "OPEN"), (.updatedAt // ""), .number]) | last
-    | if . == null then ""
+  '
+}
+
+select_icon() {
+  jq -er '
+      if . == null then ""
       elif .state == "OPEN" and .isDraft then "\uf4dd"
       elif .state == "OPEN" then "\uf407"
       elif .state == "MERGED" then "\uf419"
@@ -47,11 +52,26 @@ select_icon() {
   '
 }
 
+# gh api --paginate emits one array per page; read all pages before choosing.
+# Pending reviews have no submitted_at. A dismissed latest review maps to no icon.
+# GitHub marks human accounts as User and app/bot accounts as Bot.
+select_review_icon() {
+  jq -sr '
+    add | map(select(.submitted_at != null and .state != "PENDING" and
+      .user.type == "User"))
+    | sort_by([.submitted_at, .id]) | last
+    | if .state == "APPROVED" then "\ueab2"
+      elif .state == "COMMENTED" then "\uea6b"
+      elif .state == "CHANGES_REQUESTED" then "\ueb43"
+      else "" end
+  '
+}
+
 # A failed snapshot exits without changing metadata. Existing icons expire after 90s.
 snapshot=$("$herdr_bin" api snapshot | jq -ce '.result.snapshot')
 workspaces=$(jq -c '
   . as $snapshot | .workspaces[] | . as $w |
-  {id: .workspace_id, had_icon: ((.tokens // {}) | has("pr_icon")),
+  {id: .workspace_id,
    path: (.worktree.checkout_path // (
      $snapshot.panes | map(select(.workspace_id == $w.workspace_id))
      | sort_by([(.focused != true), (.tab_id != $w.active_tab_id)])
@@ -65,6 +85,7 @@ while IFS= read -r workspace; do
   wid=$(jq -r '.id' <<< "$workspace")
   path=$(jq -r '.path' <<< "$workspace")
   icon=
+  review_icon=
   identity=$(github_branch "$path" || :)
   if [[ -n "$identity" ]]; then
     repo=$(jq -r '.repo' <<< "$identity")
@@ -72,30 +93,42 @@ while IFS= read -r workspace; do
     if ! prs=$(gh pr list --repo "github.com/$repo" --head "$branch" --state all --limit 100 \
       --json number,state,isDraft,headRefName,headRepositoryOwner,updatedAt); then
       printf 'PR icon lookup failed for %s\n' "$repo" >&2
-    elif ! icon=$(select_icon "${repo%%/*}" "$branch" <<< "$prs"); then
+    elif ! pr=$(select_pr "${repo%%/*}" "$branch" <<< "$prs") ||
+         ! icon=$(select_icon <<< "$pr"); then
       printf 'PR icon response was invalid for %s\n' "$repo" >&2
       icon=
+    elif [[ -n "$icon" ]]; then
+      number=$(jq -r '.number' <<< "$pr")
+      if ! review_icon=$(gh api --hostname github.com --paginate \
+        "repos/$repo/pulls/$number/reviews?per_page=100" | select_review_icon); then
+        printf 'PR review lookup failed for %s#%s\n' "$repo" "$number" >&2
+        review_icon=
+      fi
     fi
     # A branch/remote switch during the request invalidates its result.
     current_identity=$(github_branch "$path" || :)
-    [[ "$current_identity" == "$identity" ]] || icon=
+    if [[ "$current_identity" != "$identity" ]]; then
+      icon=
+      review_icon=
+    fi
   fi
+
+  # Report both tokens together, explicitly clearing absent or failed lookups.
+  metadata=(--source user:pr-icons --ttl-ms 90000)
   if [[ -n "$icon" ]]; then
-    "$herdr_bin" workspace report-metadata "$wid" --source user:pr-icons \
-      --token "pr_icon=$icon" --ttl-ms 90000 >/dev/null || :
-  elif [[ $(jq -r '.had_icon' <<< "$workspace") == true ]]; then
-    "$herdr_bin" workspace report-metadata "$wid" --source user:pr-icons \
-      --clear-token pr_icon >/dev/null || :
+    metadata+=(--token "pr_icon=$icon")
+  else
+    metadata+=(--clear-token pr_icon)
   fi
+  if [[ -n "$review_icon" ]]; then
+    metadata+=(--token "pr_review_icon=$review_icon")
+  else
+    metadata+=(--clear-token pr_review_icon)
+  fi
+  "$herdr_bin" workspace report-metadata "$wid" "${metadata[@]}" >/dev/null || :
   # Agent rows read pane metadata; mirror this Space's PR status to its panes.
   while IFS= read -r pid; do
     [[ -n "$pid" ]] || continue
-    if [[ -n "$icon" ]]; then
-      "$herdr_bin" pane report-metadata "$pid" --source user:pr-icons \
-        --token "pr_icon=$icon" --ttl-ms 90000 >/dev/null || :
-    else
-      "$herdr_bin" pane report-metadata "$pid" --source user:pr-icons \
-        --clear-token pr_icon >/dev/null || :
-    fi
+    "$herdr_bin" pane report-metadata "$pid" "${metadata[@]}" >/dev/null || :
   done < <(jq -r --arg wid "$wid" '.panes[] | select(.workspace_id == $wid) | .pane_id' <<< "$snapshot")
 done <<< "$workspaces"
