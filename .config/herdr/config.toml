@@ -44,10 +44,9 @@ tab_bar_right = [
 
 [ui.sidebar.spaces]
 rows = [
-  ["state_icon", "workspace", { token = "$pr_review_icon", dim = false, rules = [
-    { equals = "", fg = "#cf222e" },
-    { equals = "", fg = "#1a7f37" },
-  ] }, { token = "$pr_icon", dim = false, rules = [
+  ["state_icon", "workspace", { token = "$pr_icon", dim = false, rules = [
+    { starts_with = "", fg = "#cf222e" },
+    { starts_with = "", fg = "#1a7f37" },
     { equals = "", fg = "#1a7f37" },
     { equals = "", fg = "#656d76" },
     { equals = "", fg = "#8250df" },
@@ -58,10 +57,9 @@ rows = [
 
 [ui.sidebar.agents]
 rows = [
-  ["state_icon", "machine", "workspace", "tab", { token = "$pr_review_icon", dim = false, rules = [
-    { equals = "", fg = "#cf222e" },
-    { equals = "", fg = "#1a7f37" },
-  ] }, { token = "$pr_icon", dim = false, rules = [
+  ["state_icon", "machine", "workspace", "tab", { token = "$pr_icon", dim = false, rules = [
+    { starts_with = "", fg = "#cf222e" },
+    { starts_with = "", fg = "#1a7f37" },
     { equals = "", fg = "#1a7f37" },
     { equals = "", fg = "#656d76" },
     { equals = "", fg = "#8250df" },

@@ -113,17 +113,13 @@ while IFS= read -r workspace; do
     fi
   fi
 
-  # Report both tokens together, explicitly clearing absent or failed lookups.
-  metadata=(--source user:pr-icons --ttl-ms 90000)
+  # One compact token avoids Herdr's separator between the review and PR glyphs.
+  # Clear the old separate review token when upgrading an existing session.
+  metadata=(--source user:pr-icons --ttl-ms 90000 --clear-token pr_review_icon)
   if [[ -n "$icon" ]]; then
-    metadata+=(--token "pr_icon=$icon")
+    metadata+=(--token "pr_icon=$review_icon$icon")
   else
     metadata+=(--clear-token pr_icon)
-  fi
-  if [[ -n "$review_icon" ]]; then
-    metadata+=(--token "pr_review_icon=$review_icon")
-  else
-    metadata+=(--clear-token pr_review_icon)
   fi
   "$herdr_bin" workspace report-metadata "$wid" "${metadata[@]}" >/dev/null || :
   # Agent rows read pane metadata; mirror this Space's PR status to its panes.
