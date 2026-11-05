@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Herdr Space PR and human review icons. Requires bash 3.2+, git, jq, authenticated gh, and herdr.
+# Herdr PR status icon. Requires bash 3.2+, git, jq, authenticated gh, and herdr.
 # Run through Herdr's periodic command hook (30s interval, 25s timeout).
 # Keep stdout empty: Herdr uses command output as visible tab-bar text.
 # Colors belong in config.toml; this script reports only Nerd Font glyphs.
@@ -53,16 +53,21 @@ select_icon() {
 }
 
 # gh api --paginate emits one array per page; read all pages before choosing.
-# Pending reviews have no submitted_at. A dismissed latest review maps to no icon.
+# Comments don't replace a person's verdict. Their latest approval, change request,
+# or dismissal wins; a dismissal must not revive an older verdict. GitHub marks
+# stale approvals DISMISSED where configured, so don't infer staleness from commits.
 # GitHub marks human accounts as User and app/bot accounts as Bot.
 select_review_icon() {
   jq -sr '
     add | map(select(.submitted_at != null and .state != "PENDING" and
-      .user.type == "User"))
-    | sort_by([.submitted_at, .id]) | last
-    | if .state == "APPROVED" then "\ueab2"
-      elif .state == "COMMENTED" then "\uea6b"
-      elif .state == "CHANGES_REQUESTED" then "\ueb43"
+      .user.type == "User")) as $reviews
+    | [$reviews | group_by(.user.id // (.user.login | ascii_downcase))[]
+       | map(select(.state == "APPROVED" or .state == "CHANGES_REQUESTED" or
+                    .state == "DISMISSED"))
+       | sort_by([.submitted_at, .id]) | last | .state] as $verdicts
+    | if any($verdicts[]; . == "CHANGES_REQUESTED") then "\ueb43"
+      elif any($verdicts[]; . == "APPROVED") then "\ueab2"
+      elif any($reviews[]; .state == "COMMENTED") then "\uea6b"
       else "" end
   '
 }
@@ -97,13 +102,15 @@ while IFS= read -r workspace; do
          ! icon=$(select_icon <<< "$pr"); then
       printf 'PR icon response was invalid for %s\n' "$repo" >&2
       icon=
-    elif [[ -n "$icon" ]]; then
+    # Closed, merged, and draft states take precedence over reviews.
+    elif [[ $(jq -r '.state == "OPEN" and (.isDraft | not)' <<< "$pr") == true ]]; then
       number=$(jq -r '.number' <<< "$pr")
       if ! review_icon=$(gh api --hostname github.com --paginate \
         "repos/$repo/pulls/$number/reviews?per_page=100" | select_review_icon); then
         printf 'PR review lookup failed for %s#%s\n' "$repo" "$number" >&2
         review_icon=
       fi
+      [[ -z "$review_icon" ]] || icon=$review_icon
     fi
     # A branch/remote switch during the request invalidates its result.
     current_identity=$(github_branch "$path" || :)
@@ -113,17 +120,12 @@ while IFS= read -r workspace; do
     fi
   fi
 
-  # Report both tokens together, explicitly clearing absent or failed lookups.
-  metadata=(--source user:pr-icons --ttl-ms 90000)
+  # Render one relevant icon, and clear the legacy separate review token.
+  metadata=(--source user:pr-icons --ttl-ms 90000 --clear-token pr_review_icon)
   if [[ -n "$icon" ]]; then
     metadata+=(--token "pr_icon=$icon")
   else
     metadata+=(--clear-token pr_icon)
-  fi
-  if [[ -n "$review_icon" ]]; then
-    metadata+=(--token "pr_review_icon=$review_icon")
-  else
-    metadata+=(--clear-token pr_review_icon)
   fi
   "$herdr_bin" workspace report-metadata "$wid" "${metadata[@]}" >/dev/null || :
   # Agent rows read pane metadata; mirror this Space's PR status to its panes.
