@@ -53,8 +53,9 @@ select_icon() {
 }
 
 # gh api --paginate emits one array per page; read all pages before choosing.
-# Comments don't replace a person's verdict. Their latest approval, change request,
-# or dismissal wins; a dismissal must not revive an older verdict. GitHub marks
+# Submitted Comment reviews supersede earlier change requests by that reviewer.
+# Ordinary PR comments are not reviews. Approvals persist until a later change
+# request or dismissal; a dismissal must not revive an older verdict. GitHub marks
 # stale approvals DISMISSED where configured. Other review states on older
 # commits need another review, indicated by the eye icon.
 # GitHub marks human accounts as User and app/bot accounts as Bot.
@@ -63,14 +64,16 @@ select_review_icon() {
     add | map(select(.submitted_at != null and .state != "PENDING" and
       .user.type == "User")) as $reviews
     | [$reviews | group_by(.user.id // (.user.login | ascii_downcase))[]
-       | map(select(.state == "APPROVED" or .state == "CHANGES_REQUESTED" or
-                    .state == "DISMISSED"))
-       | sort_by([.submitted_at, .id]) | last | select(. != null)] as $verdicts
+       | sort_by([.submitted_at, .id]) as $history
+       | ($history | map(select(.state == "APPROVED" or
+           .state == "CHANGES_REQUESTED" or .state == "DISMISSED")) | last) as $verdict
+       | if $verdict.state == "APPROVED" then $verdict else $history | last end
+       | select(. != null)] as $verdicts
     | if any($verdicts[]; .state == "CHANGES_REQUESTED" and .commit_id == $head) then "\ueb43"
       elif any($verdicts[]; .state == "CHANGES_REQUESTED" and .commit_id != $head) then "\uea70"
       elif any($verdicts[]; .state == "APPROVED") then "\ueab2"
-      elif any($reviews[]; .state == "COMMENTED" and .commit_id == $head) then "\uea6b"
-      elif any($reviews[]; .state != "APPROVED" and .commit_id != $head) then "\uea70"
+      elif any($verdicts[]; .state == "COMMENTED" and .commit_id == $head) then "\uea6b"
+      elif any($verdicts[]; .state != "APPROVED" and .commit_id != $head) then "\uea70"
       else "" end
   '
 }
