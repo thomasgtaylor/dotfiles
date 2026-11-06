@@ -55,52 +55,24 @@ select_icon() {
 # gh api --paginate emits one array per page; read all pages before choosing.
 # Comments don't replace a person's verdict. Their latest approval, change request,
 # or dismissal wins; a dismissal must not revive an older verdict. GitHub marks
-# stale approvals DISMISSED where configured, so don't infer staleness from commits.
+# stale approvals DISMISSED where configured. Other review states on older
+# commits need another review, indicated by the eye icon.
 # GitHub marks human accounts as User and app/bot accounts as Bot.
-select_review_summary() {
-  jq -sr '
+select_review_icon() {
+  jq -sr --arg head "$1" '
     add | map(select(.submitted_at != null and .state != "PENDING" and
       .user.type == "User")) as $reviews
     | [$reviews | group_by(.user.id // (.user.login | ascii_downcase))[]
        | map(select(.state == "APPROVED" or .state == "CHANGES_REQUESTED" or
                     .state == "DISMISSED"))
-       | sort_by([.submitted_at, .id]) | last | .state] as $verdicts
-    | (if any($verdicts[]; . == "CHANGES_REQUESTED") then "CHANGES_REQUESTED"
-       elif any($verdicts[]; . == "APPROVED") then "APPROVED"
-       elif any($reviews[]; .state == "COMMENTED") then "COMMENTED"
-       else "" end) as $status
-    | {status: $status,
-       icon: ({APPROVED: "\ueab2", CHANGES_REQUESTED: "\ueb43", COMMENTED: "\uea6b"}[$status] // ""),
-       review: ($reviews | sort_by([.submitted_at, .id]) | last
-                | if . == null then null else {commit_id, user: {id: .user.id, login: .user.login}} end)}
+       | sort_by([.submitted_at, .id]) | last | select(. != null)] as $verdicts
+    | if any($verdicts[]; .state == "CHANGES_REQUESTED" and .commit_id == $head) then "\ueb43"
+      elif any($verdicts[]; .state == "CHANGES_REQUESTED" and .commit_id != $head) then "\uea70"
+      elif any($verdicts[]; .state == "APPROVED") then "\ueab2"
+      elif any($reviews[]; .state == "COMMENTED" and .commit_id == $head) then "\uea6b"
+      elif any($reviews[]; .state != "APPROVED" and .commit_id != $head) then "\uea70"
+      else "" end
   '
-}
-
-# Compare commit ancestry, not timestamps: rebases and cherry-picks can preserve
-# old dates. Only commits introduced since the latest human-reviewed snapshot
-# count. Commit authorship identifies "someone else"; unlinked authors count too.
-needs_another_look() {
-  local repo=$1 pr=$2 summary=$3 reviewed head reviewer_id reviewer_login comparison
-  reviewed=$(jq -r '.review.commit_id // ""' <<< "$summary")
-  head=$(jq -r '.headRefOid // ""' <<< "$pr")
-  [[ "$reviewed" =~ ^[0-9a-fA-F]{40}$ && "$head" =~ ^[0-9a-fA-F]{40}$ ]] || return 1
-  [[ "$reviewed" != "$head" ]] || return 1
-  reviewer_id=$(jq -c '.review.user.id' <<< "$summary")
-  reviewer_login=$(jq -r '.review.user.login // ""' <<< "$summary")
-  if ! comparison=$(gh api --hostname github.com --paginate \
-    "repos/$repo/compare/$reviewed...$head?per_page=100" \
-    --jq '{status, commits: [.commits[] | {author}]}'); then
-    printf 'PR commit comparison failed for %s\n' "$repo" >&2
-    return 1
-  fi
-  jq -es --argjson reviewer_id "$reviewer_id" --arg reviewer_login "$reviewer_login" '
-    (.[0].status == "ahead" or .[0].status == "diverged") and
-    any(.[].commits[];
-      if $reviewer_id != null and .author.id != null then .author.id != $reviewer_id
-      elif .author.login != null and $reviewer_login != "" then
-        (.author.login | ascii_downcase) != ($reviewer_login | ascii_downcase)
-      else true end)
-  ' <<< "$comparison" >/dev/null
 }
 
 # A failed snapshot exits without changing metadata. Existing icons expire after 90s.
@@ -127,7 +99,7 @@ while IFS= read -r workspace; do
     repo=$(jq -r '.repo' <<< "$identity")
     branch=$(jq -r '.branch' <<< "$identity")
     if ! prs=$(gh pr list --repo "github.com/$repo" --head "$branch" --state all --limit 100 \
-      --json number,state,isDraft,headRefName,headRefOid,headRepositoryOwner,updatedAt); then
+      --json number,state,isDraft,headRefName,headRepositoryOwner,updatedAt,headRefOid); then
       printf 'PR icon lookup failed for %s\n' "$repo" >&2
     elif ! pr=$(select_pr "${repo%%/*}" "$branch" <<< "$prs") ||
          ! icon=$(select_icon <<< "$pr"); then
@@ -136,19 +108,12 @@ while IFS= read -r workspace; do
     # Closed, merged, and draft states take precedence over reviews.
     elif [[ $(jq -r '.state == "OPEN" and (.isDraft | not)' <<< "$pr") == true ]]; then
       number=$(jq -r '.number' <<< "$pr")
-      if ! summary=$(gh api --hostname github.com --paginate \
-        "repos/$repo/pulls/$number/reviews?per_page=100" | select_review_summary); then
+      if ! review_icon=$(gh api --hostname github.com --paginate \
+        "repos/$repo/pulls/$number/reviews?per_page=100" | select_review_icon "$(jq -r .headRefOid <<< "$pr")"); then
         printf 'PR review lookup failed for %s#%s\n' "$repo" "$number" >&2
-      else
-        review_icon=$(jq -r '.icon' <<< "$summary")
-        [[ -z "$review_icon" ]] || icon=$review_icon
-        # Approval stays green. New comments and other review events cannot
-        # trigger attention; only new commits by someone other than the reviewer.
-        if jq -e '.status == "CHANGES_REQUESTED" or .status == "COMMENTED"' \
-             <<< "$summary" >/dev/null && needs_another_look "$repo" "$pr" "$summary"; then
-          icon=$(jq -nr '"\uf441"')
-        fi
+        review_icon=
       fi
+      [[ -z "$review_icon" ]] || icon=$review_icon
     fi
     # A branch/remote switch during the request invalidates its result.
     current_identity=$(github_branch "$path" || :)
